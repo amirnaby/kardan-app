@@ -1,7 +1,6 @@
 package com.niam.kardan.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.niam.authserver.persistence.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,12 +12,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Part")
+@Entity(name = "Plan")
 @Table
-@SequenceGenerator(name = "part_seq", sequenceName = "part_seq", allocationSize = 1)
+@SequenceGenerator(name = "plan_seq", sequenceName = "plan_seq", allocationSize = 1)
 public class Plan {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plan_seq")
     private Long id;
     private String name;
     private String code;
@@ -29,8 +28,6 @@ public class Plan {
     @JoinColumn
     private Operation operation;
     private Integer priority;
-    @OneToOne
-    private User user;
-
+    private String username;
     private LocalDateTime dueDate;
 }
