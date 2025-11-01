@@ -2,25 +2,28 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.7</version>
         <relativePath/>
     </parent>
-    <groupId>com.niam.kardan</groupId>
-    <artifactId>kardan-app</artifactId>
+
+    <groupId>com.niam</groupId>
+    <artifactId>kardan</artifactId>
     <version>1.0.0</version>
-    <name>Kardan App</name>
-    <description>Kardan App</description>
+    <name>Kardan</name>
+    <description>Kardan</description>
 
     <properties>
         <java.version>21</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.niam</groupId>
-            <artifactId>common-module</artifactId>
+            <artifactId>common</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
@@ -38,6 +41,7 @@
             <artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -46,10 +50,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <release>${java.version}</release>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
