@@ -23,11 +23,6 @@
     <dependencies>
         <dependency>
             <groupId>com.niam</groupId>
-            <artifactId>common</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.niam</groupId>
             <artifactId>user-management</artifactId>
             <version>1.0.0</version>
         </dependency>
