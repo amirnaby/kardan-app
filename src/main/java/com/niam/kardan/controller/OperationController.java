@@ -2,7 +2,7 @@ package com.niam.kardan.controller;
 
 import com.niam.common.model.response.ServiceResponse;
 import com.niam.common.utils.ResponseEntityUtil;
-import com.niam.kardan.model.Operation;
+import com.niam.kardan.model.PartOperation;
 import com.niam.kardan.service.OperationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +16,13 @@ public class OperationController {
     private final ResponseEntityUtil responseEntityUtil;
 
     @PostMapping
-    public ResponseEntity<ServiceResponse> saveOperation(@RequestBody Operation operation) {
-        return responseEntityUtil.ok(operationService.saveOperation(operation));
+    public ResponseEntity<ServiceResponse> saveOperation(@RequestBody PartOperation partOperation) {
+        return responseEntityUtil.ok(operationService.saveOperation(partOperation));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceResponse> updateOperation(@PathVariable Long id, @RequestBody Operation operation) {
-        return responseEntityUtil.ok(operationService.updateOperation(id, operation));
+    public ResponseEntity<ServiceResponse> updateOperation(@PathVariable Long id, @RequestBody PartOperation partOperation) {
+        return responseEntityUtil.ok(operationService.updateOperation(id, partOperation));
     }
 
     @DeleteMapping("/{id}")

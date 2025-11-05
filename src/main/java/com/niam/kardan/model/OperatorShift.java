@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.niam.common.utils.CustomLocalDateTimeDeserializer;
 import com.niam.common.utils.CustomLocalDateTimeSerializer;
-import com.niam.kardan.model.basedata.ProjectStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,25 +20,24 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Project")
+@Entity(name = "OperatorShift")
 @Table
-@SequenceGenerator(name = "Project_seq", sequenceName = "Project_seq", allocationSize = 1)
-public class Project extends Auditable {
+@SequenceGenerator(name = "OperatorShift_seq", sequenceName = "OperatorShift_seq", allocationSize = 1)
+public class OperatorShift extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Project_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperatorShift_seq")
     private Long id;
-    @NotNull
-    @NotBlank
-    @Column(unique = true)
-    private String name;
-    private String description;
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    private LocalDateTime startDate;
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    private LocalDateTime endDate;
     @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
-    private ProjectStatus status;
+    @JoinColumn(name = "operator_id", referencedColumnName = "id", nullable = false)
+    private Operator operator;
+    @ManyToOne
+    @JoinColumn(name = "shift_id", referencedColumnName = "id", nullable = false)
+    private Shift shift;
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    private LocalDateTime assignedAt;
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    private LocalDateTime unassignedAt;
+    private Boolean isPrimary;
 }

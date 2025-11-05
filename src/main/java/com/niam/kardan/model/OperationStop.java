@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.niam.common.utils.CustomLocalDateTimeDeserializer;
 import com.niam.common.utils.CustomLocalDateTimeSerializer;
-import com.niam.kardan.model.basedata.ProjectStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,25 +20,24 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Project")
+@Entity(name = "OperationStop")
 @Table
-@SequenceGenerator(name = "Project_seq", sequenceName = "Project_seq", allocationSize = 1)
-public class Project extends Auditable {
+@SequenceGenerator(name = "OperationStop_seq", sequenceName = "OperationStop_seq", allocationSize = 1)
+public class OperationStop extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Project_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperationStop_seq")
     private Long id;
-    @NotNull
-    @NotBlank
-    @Column(unique = true)
-    private String name;
-    private String description;
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    private LocalDateTime startDate;
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    private LocalDateTime endDate;
+    private String comment;
     @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
-    private ProjectStatus status;
+    @JoinColumn(name = "operation_execution_id", referencedColumnName = "id", nullable = false)
+    private OperationExecution operationExecution;
+    @ManyToOne
+    @JoinColumn(name = "stop_reason_id", referencedColumnName = "id", nullable = false)
+    private StopReason stopReason;
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    private LocalDateTime startedAt;
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    private LocalDateTime endedAt;
 }

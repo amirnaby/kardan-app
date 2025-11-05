@@ -1,9 +1,8 @@
 package com.niam.kardan.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.niam.usermanagement.entities.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,16 +15,14 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Operation")
+@Entity(name = "Operator")
 @Table
-@SequenceGenerator(name = "Operation_seq", sequenceName = "Operation_seq", allocationSize = 1)
-public class Operation extends Auditable {
+@SequenceGenerator(name = "Operator_seq", sequenceName = "Operator_seq", allocationSize = 1)
+public class Operator extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Operation_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Operator_seq")
     private Long id;
-    @NotNull
-    @NotBlank
-    @Column(unique = true)
-    private String name;
-    private String description;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 }

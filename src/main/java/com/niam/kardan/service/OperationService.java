@@ -3,7 +3,7 @@ package com.niam.kardan.service;
 import com.niam.common.exception.EntityNotFoundException;
 import com.niam.common.exception.ResultResponseStatus;
 import com.niam.common.utils.MessageUtil;
-import com.niam.kardan.model.Operation;
+import com.niam.kardan.model.PartOperation;
 import com.niam.kardan.repository.OperationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,25 +16,25 @@ public class OperationService {
     private final OperationRepository operationRepository;
     private final MessageUtil messageUtil;
 
-    public Operation saveOperation(Operation operation) {
-        return operationRepository.save(operation);
+    public PartOperation saveOperation(PartOperation partOperation) {
+        return operationRepository.save(partOperation);
     }
 
-    public Operation updateOperation(Long id, Operation updatedOperation) {
-        Operation existingOperation = getOperation(id);
-        return operationRepository.save(existingOperation);
+    public PartOperation updateOperation(Long id, PartOperation updatedPartOperation) {
+        PartOperation existingPartOperation = getOperation(id);
+        return operationRepository.save(existingPartOperation);
     }
 
     public void deleteOperation(Long id) {
-        Operation operation = getOperation(id);
-        operationRepository.delete(operation);
+        PartOperation partOperation = getOperation(id);
+        operationRepository.delete(partOperation);
     }
 
-    public List<Operation> getAllOperations() {
+    public List<PartOperation> getAllOperations() {
         return operationRepository.findAll();
     }
 
-    public Operation getOperation(Long id) {
+    public PartOperation getOperation(Long id) {
         return operationRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException(

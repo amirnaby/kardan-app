@@ -1,9 +1,9 @@
 package com.niam.kardan.repository;
 
-import com.niam.kardan.model.PartOperation;
+import com.niam.kardan.model.basedata.ProjectStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OperationRepository extends JpaRepository<PartOperation, Long> {
+public interface ProjectStatusRepository extends JpaRepository<ProjectStatus, Long> {
 }

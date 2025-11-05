@@ -1,7 +1,7 @@
 package com.niam.kardan.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.niam.kardan.model.basedata.PartStatus;
+import com.niam.kardan.model.basedata.StopReasonCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,27 +17,19 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Part")
+@Entity(name = "StopReason")
 @Table
-@SequenceGenerator(name = "Part_seq", sequenceName = "Part_seq", allocationSize = 1)
-public class Part extends Auditable {
+@SequenceGenerator(name = "StopReason_seq", sequenceName = "StopReason_seq", allocationSize = 1)
+public class StopReason extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Part_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "StopReason_seq")
     private Long id;
     @NotNull
     @NotBlank
+    @Column(unique = true)
     private String name;
     private String description;
-    @Lob
-    private String manufacturingPlan;
-    @NotNull
-    @NotBlank
-    @Column(unique = true)
-    private String code;
     @ManyToOne
-    @JoinColumn(name = "project_id", referencedColumnName = "id", nullable = false)
-    private Project project;
-    @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
-    private PartStatus status;
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    private StopReasonCategory category;
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.niam.common.utils.CustomLocalDateTimeDeserializer;
 import com.niam.common.utils.CustomLocalDateTimeSerializer;
-import com.niam.kardan.model.basedata.ProjectStatus;
+import com.niam.kardan.model.basedata.ShiftStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,12 +23,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Project")
+@Entity(name = "Shift")
 @Table
-@SequenceGenerator(name = "Project_seq", sequenceName = "Project_seq", allocationSize = 1)
-public class Project extends Auditable {
+@SequenceGenerator(name = "Shift_seq", sequenceName = "Shift_seq", allocationSize = 1)
+public class Shift extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Project_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Shift_seq")
     private Long id;
     @NotNull
     @NotBlank
@@ -37,11 +37,11 @@ public class Project extends Auditable {
     private String description;
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    private LocalDateTime startDate;
+    private LocalDateTime startTime;
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    private LocalDateTime endDate;
+    private LocalDateTime endTime;
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
-    private ProjectStatus status;
+    private ShiftStatus status;
 }

@@ -1,12 +1,18 @@
 package com.niam.kardan.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.niam.kardan.model.basedata.MachineStatus;
+import com.niam.kardan.model.basedata.MachineType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -15,15 +21,19 @@ import lombok.*;
 @Entity(name = "Machine")
 @Table
 @SequenceGenerator(name = "Machine_seq", sequenceName = "Machine_seq", allocationSize = 1)
-public class Machine {
+public class Machine extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Machine_seq")
     private Long id;
-    @NotNull @NotBlank
-    private String name;
-    @NotNull @NotBlank
+    @NotNull
+    @NotBlank
+    @Column(unique = true)
     private String code;
-    @NotNull @NotBlank
-    @OneToOne
-    private Operation operation;
+    private String location;
+    @ManyToOne
+    @JoinColumn(name = "machine_type_id", referencedColumnName = "id", nullable = false)
+    private MachineType machineType;
+    @ManyToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
+    private MachineStatus machineStatus;
 }
