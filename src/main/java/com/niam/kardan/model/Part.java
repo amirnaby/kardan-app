@@ -34,10 +34,10 @@ public class Part extends Auditable {
     @NotBlank
     @Column(unique = true)
     private String code;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", referencedColumnName = "id", nullable = false)
     private Project project;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
     private PartStatus status;
 }

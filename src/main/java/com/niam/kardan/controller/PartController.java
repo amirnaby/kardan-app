@@ -6,6 +6,7 @@ import com.niam.kardan.model.Part;
 import com.niam.kardan.service.PartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -15,29 +16,34 @@ public class PartController {
     private final PartService partService;
     private final ResponseEntityUtil responseEntityUtil;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ServiceResponse> savePart(@RequestBody Part part) {
-        return responseEntityUtil.ok(partService.savePart(part));
+        return responseEntityUtil.ok(partService.create(part));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponse> updatePart(@PathVariable Long id, @RequestBody Part part) {
-        return responseEntityUtil.ok(partService.updatePart(id, part));
+        return responseEntityUtil.ok(partService.update(id, part));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ServiceResponse> deletePart(@PathVariable Long id) {
-        partService.deletePart(id);
+        partService.delete(id);
         return responseEntityUtil.ok("Part deleted successfully");
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponse> findPart(@PathVariable Long id) {
-        return responseEntityUtil.ok(partService.getPart(id));
+        return responseEntityUtil.ok(partService.getById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @GetMapping
     public ResponseEntity<ServiceResponse> findAllParts() {
-        return responseEntityUtil.ok(partService.getAllParts());
+        return responseEntityUtil.ok(partService.getAll());
     }
 }

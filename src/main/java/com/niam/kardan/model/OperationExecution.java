@@ -28,19 +28,19 @@ public class OperationExecution extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperationExecution_seq")
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "task_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)
     private PartOperationTask task;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "part_operation_id", referencedColumnName = "id")
     private PartOperation partOperation;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
     private Machine machine;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id", referencedColumnName = "id")
     private Operator operator;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private ExecutionStatus executionStatus;
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)

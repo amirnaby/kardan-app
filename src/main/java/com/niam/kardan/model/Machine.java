@@ -30,10 +30,10 @@ public class Machine extends Auditable {
     @Column(unique = true)
     private String code;
     private String location;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "machine_type_id", referencedColumnName = "id", nullable = false)
     private MachineType machineType;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
     private MachineStatus machineStatus;
 }

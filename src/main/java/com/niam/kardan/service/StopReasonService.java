@@ -3,8 +3,8 @@ package com.niam.kardan.service;
 import com.niam.common.exception.EntityNotFoundException;
 import com.niam.common.exception.ResultResponseStatus;
 import com.niam.common.utils.MessageUtil;
-import com.niam.kardan.model.Operation;
-import com.niam.kardan.repository.OperationRepository;
+import com.niam.kardan.model.StopReason;
+import com.niam.kardan.repository.StopReasonRepository;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -21,53 +21,54 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class OperationService {
-    private final OperationRepository operationRepository;
+public class StopReasonService {
+
+    private final StopReasonRepository stopReasonRepository;
     private final MessageUtil messageUtil;
 
     @Lazy
     @Autowired
-    private OperationService self;
+    private StopReasonService self;
 
     @Transactional
-    @CacheEvict(value = {"operations", "operation"}, allEntries = true)
-    public Operation create(Operation operation) {
-        return operationRepository.save(operation);
+    @CacheEvict(value = {"stopReasons", "stopReason"}, allEntries = true)
+    public StopReason create(StopReason stopReason) {
+        return stopReasonRepository.save(stopReason);
     }
 
     @Transactional
-    @CacheEvict(value = {"operations", "operation"}, allEntries = true)
-    public Operation update(Long id, Operation updated) {
-        Operation existing = self.getById(id);
+    @CacheEvict(value = {"stopReasons", "stopReason"}, allEntries = true)
+    public StopReason update(Long id, StopReason updated) {
+        StopReason existing = self.getById(id);
         BeanUtils.copyProperties(updated, existing, "id", "createdAt", "updatedAt");
-        return operationRepository.save(existing);
+        return stopReasonRepository.save(existing);
     }
 
-    @Cacheable(value = "operation", key = "#id")
-    public Operation getById(Long id) {
-        return operationRepository.findById(id)
+    @Cacheable(value = "stopReason", key = "#id")
+    public StopReason getById(Long id) {
+        return stopReasonRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException(
                                 ResultResponseStatus.ENTITY_NOT_FOUND.getResponseCode(),
                                 ResultResponseStatus.ENTITY_NOT_FOUND.getReasonCode(),
                                 messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(),
-                                        "Operation")));
+                                        "StopReason")));
     }
 
-    @Cacheable(value = "operations")
-    public List<Operation> getAll() {
-        return operationRepository.findAll();
+    @Cacheable(value = "stopReasons")
+    public List<StopReason> getAll() {
+        return stopReasonRepository.findAll();
     }
 
     @Transactional
-    @CacheEvict(value = {"operations", "operation"}, allEntries = true)
+    @CacheEvict(value = {"stopReasons", "stopReason"}, allEntries = true)
     public void delete(Long id) {
-        Operation operation = self.getById(id);
+        StopReason reason = self.getById(id);
         try {
-            operationRepository.delete(operation);
+            stopReasonRepository.delete(reason);
         } catch (DataIntegrityViolationException e) {
             throw new EntityExistsException(
-                    messageUtil.getMessage(ResultResponseStatus.ENTITY_HAS_DEPENDENCIES.getDescription(), "Operation"));
+                    messageUtil.getMessage(ResultResponseStatus.ENTITY_HAS_DEPENDENCIES.getDescription(), "StopReason"));
         }
     }
 }

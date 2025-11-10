@@ -5,42 +5,65 @@ import com.niam.common.exception.ResultResponseStatus;
 import com.niam.common.utils.MessageUtil;
 import com.niam.kardan.model.Project;
 import com.niam.kardan.repository.ProjectRepository;
+import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final MessageUtil messageUtil;
 
-    public Project saveProject(Project project) {
+    @Lazy
+    @Autowired
+    private ProjectService self;
+
+    @Transactional
+    @CacheEvict(value = {"projects", "project"}, allEntries = true)
+    public Project create(Project project) {
         return projectRepository.save(project);
     }
 
-    public Project updateProject(Long id, Project updatedProject) {
-        Project existingProject = getProject(id);
-        return projectRepository.save(existingProject);
+    @Transactional
+    @CacheEvict(value = {"projects", "project"}, allEntries = true)
+    public Project update(Long id, Project updated) {
+        Project existing = self.getById(id);
+        BeanUtils.copyProperties(updated, existing, "id", "createdAt", "updatedAt");
+        return projectRepository.save(existing);
     }
 
-    public void deleteProject(Long id) {
-        Project project = getProject(id);
-        projectRepository.delete(project);
+    @Cacheable(value = "project", key = "#id")
+    public Project getById(Long id) {
+        return projectRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                ResultResponseStatus.ENTITY_NOT_FOUND.getResponseCode(),
+                ResultResponseStatus.ENTITY_NOT_FOUND.getReasonCode(),
+                messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(), "Project")));
     }
 
-    public List<Project> getAllProjects() {
+    @Cacheable(value = "projects")
+    public List<Project> getAll() {
         return projectRepository.findAll();
     }
 
-    public Project getProject(Long id) {
-        return projectRepository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(
-                                ResultResponseStatus.ENTITY_NOT_FOUND.getResponseCode(),
-                                ResultResponseStatus.ENTITY_NOT_FOUND.getReasonCode(),
-                                messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(),
-                                        "Project")));
+    @Transactional
+    @CacheEvict(value = {"projects", "project"}, allEntries = true)
+    public void delete(Long id) {
+        Project project = self.getById(id);
+        try {
+            projectRepository.delete(project);
+        } catch (DataIntegrityViolationException e) {
+            throw new EntityExistsException(messageUtil.getMessage(ResultResponseStatus.ENTITY_HAS_DEPENDENCIES.getDescription(), "Project"));
+        }
     }
 }

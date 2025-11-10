@@ -1,4 +1,4 @@
-package com.niam.kardan.repository;
+package com.niam.kardan.repository.basedata;
 
 import com.niam.kardan.model.basedata.MachineStatus;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -16,7 +16,7 @@ public interface PartOperationTaskRepository extends JpaRepository<PartOperation
     // tasks visible to operator via OperatorMachine relationship (dynamic: join)
     @Query("""
                SELECT t FROM PartOperationTask t
-               JOIN OperatorMachine om ON om.machine.id = t.machine.id
+               JOIN OperatorMachine om ON om.machine.id = t.targetMachine.id
                WHERE om.operator.id = :operatorId
                  AND t.taskStatus.id = :pendingStatusId
             """)
@@ -28,7 +28,7 @@ public interface PartOperationTaskRepository extends JpaRepository<PartOperation
     Optional<PartOperationTask> findByIdForUpdate(@Param("id") Long id);
 
     // find pending tasks targeting a machine (for reassign/monitor)
-    List<PartOperationTask> findByMachineIdAndTaskStatus_Id(Long machineId, Long statusId);
+    List<PartOperationTask> findByTargetMachineIdAndTaskStatus_Id(Long machineId, Long statusId);
 
     // find tasks by part_operation
     List<PartOperationTask> findByPartOperationId(Long partOperationId);

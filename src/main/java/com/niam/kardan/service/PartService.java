@@ -5,42 +5,65 @@ import com.niam.common.exception.ResultResponseStatus;
 import com.niam.common.utils.MessageUtil;
 import com.niam.kardan.model.Part;
 import com.niam.kardan.repository.PartRepository;
+import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PartService {
     private final PartRepository partRepository;
     private final MessageUtil messageUtil;
 
-    public Part savePart(Part part) {
+    @Lazy
+    @Autowired
+    private PartService self;
+
+    @Transactional
+    @CacheEvict(value = {"parts", "part"}, allEntries = true)
+    public Part create(Part part) {
         return partRepository.save(part);
     }
 
-    public Part updatePart(Long id, Part updatedPart) {
-        Part existingPart = getPart(id);
-        return partRepository.save(existingPart);
+    @Transactional
+    @CacheEvict(value = {"parts", "part"}, allEntries = true)
+    public Part update(Long id, Part updated) {
+        Part existing = self.getById(id);
+        BeanUtils.copyProperties(updated, existing, "id", "createdAt", "updatedAt");
+        return partRepository.save(existing);
     }
 
-    public void deletePart(Long id) {
-        Part part = getPart(id);
-        partRepository.delete(part);
+    @Cacheable(value = "part", key = "#id")
+    public Part getById(Long id) {
+        return partRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                ResultResponseStatus.ENTITY_NOT_FOUND.getResponseCode(),
+                ResultResponseStatus.ENTITY_NOT_FOUND.getReasonCode(),
+                messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(), "Part")));
     }
 
-    public List<Part> getAllParts() {
+    @Cacheable(value = "parts")
+    public List<Part> getAll() {
         return partRepository.findAll();
     }
 
-    public Part getPart(Long id) {
-        return partRepository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(
-                                ResultResponseStatus.ENTITY_NOT_FOUND.getResponseCode(),
-                                ResultResponseStatus.ENTITY_NOT_FOUND.getReasonCode(),
-                                messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(),
-                                        "Part")));
+    @Transactional
+    @CacheEvict(value = {"parts", "part"}, allEntries = true)
+    public void delete(Long id) {
+        Part part = self.getById(id);
+        try {
+            partRepository.delete(part);
+        } catch (DataIntegrityViolationException e) {
+            throw new EntityExistsException(messageUtil.getMessage(ResultResponseStatus.ENTITY_HAS_DEPENDENCIES.getDescription(), "Part"));
+        }
     }
 }

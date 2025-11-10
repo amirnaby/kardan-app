@@ -27,10 +27,10 @@ public class OperatorShift extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperatorShift_seq")
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id", referencedColumnName = "id", nullable = false)
     private Operator operator;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shift_id", referencedColumnName = "id", nullable = false)
     private Shift shift;
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)

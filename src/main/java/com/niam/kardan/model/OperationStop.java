@@ -28,10 +28,10 @@ public class OperationStop extends Auditable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperationStop_seq")
     private Long id;
     private String comment;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operation_execution_id", referencedColumnName = "id", nullable = false)
     private OperationExecution operationExecution;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stop_reason_id", referencedColumnName = "id", nullable = false)
     private StopReason stopReason;
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)

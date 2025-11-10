@@ -10,8 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Duration;
-
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,17 +25,17 @@ public class PartOperation extends Auditable {
     private Long id;
     @NotNull
     private Integer sequence;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "part_id", referencedColumnName = "id", nullable = false)
     private Part part;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operation_id", referencedColumnName = "id", nullable = false)
     private Operation operation;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "machine_id", referencedColumnName = "id", nullable = false)
     private Machine machine;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
     private PartOperationStatus partOperationStatus;
-    private Duration estimatedDuration;
+    private Long estimatedDuration;
 }

@@ -27,10 +27,10 @@ public class OperatorMachine extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperatorMachine_seq")
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id", referencedColumnName = "id", nullable = false)
     private Operator operator;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "machine_id", referencedColumnName = "id", nullable = false)
     private Machine machine;
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
