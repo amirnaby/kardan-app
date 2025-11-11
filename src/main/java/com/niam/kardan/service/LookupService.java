@@ -1,6 +1,5 @@
 package com.niam.kardan.service;
 
-import com.niam.kardan.repository.*;
 import com.niam.kardan.repository.basedata.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

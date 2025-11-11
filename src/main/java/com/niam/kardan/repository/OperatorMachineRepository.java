@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface OperatorMachineRepository extends JpaRepository<OperatorMachine, Long> {
     List<OperatorMachine> findByOperatorIdAndUnassignedAtIsNull(Long operatorId);
+
     boolean existsByOperatorIdAndMachineIdAndUnassignedAtIsNull(Long operatorId, Long machineId);
 }

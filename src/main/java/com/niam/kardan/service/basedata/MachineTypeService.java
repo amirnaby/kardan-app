@@ -4,7 +4,9 @@ import com.niam.common.utils.MessageUtil;
 import com.niam.kardan.model.basedata.MachineType;
 import com.niam.kardan.repository.basedata.MachineTypeRepository;
 import com.niam.kardan.service.BaseDataService;
-import org.springframework.cache.annotation.*;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
