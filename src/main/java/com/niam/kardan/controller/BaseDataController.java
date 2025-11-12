@@ -3,18 +3,37 @@ package com.niam.kardan.controller;
 import com.niam.kardan.model.basedata.BaseData;
 import com.niam.kardan.service.GenericBaseDataService;
 import com.niam.kardan.service.GenericBaseDataServiceFactory;
+import jakarta.persistence.Entity;
 import lombok.RequiredArgsConstructor;
+import org.reflections.Reflections;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/basedata")
 @RequiredArgsConstructor
 public class BaseDataController {
     private final GenericBaseDataServiceFactory factory;
+
+    /**
+     * Example: GET /api/basedata/entities
+     * Returns all ٍEntities.
+     */
+    @GetMapping("/entities")
+    public List<String> getAllBaseDataEntities() {
+        Reflections reflections = new Reflections("com.niam.kardan.model.basedata");
+        Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
+
+        return entities.stream()
+                .map(Class::getSimpleName)
+                .sorted()
+                .collect(Collectors.toList());
+    }
 
     /**
      * Example: GET /api/basedata/ExecutionStatus
