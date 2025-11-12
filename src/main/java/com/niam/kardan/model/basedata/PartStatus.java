@@ -12,7 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Entity
+@Entity(name = "PartStatus")
 @Table(name = "part_status")
 @SequenceGenerator(name = "part_status_seq", sequenceName = "part_status_seq", allocationSize = 1)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity
+@Entity(name = "OperatorMachine")
 @Table(name = "operator_machine")
 @SequenceGenerator(name = "operator_machine_seq", sequenceName = "operator_machine_seq", allocationSize = 1)
 public class OperatorMachine extends Auditable {

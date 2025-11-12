@@ -12,7 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Entity
+@Entity(name = "StopReasonCategory")
 @Table(name = "stop_reason_category")
 @SequenceGenerator(name = "stop_reason_category_seq", sequenceName = "stop_reason_category_seq", allocationSize = 1)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

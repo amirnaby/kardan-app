@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity
+@Entity(name = "PartOperation")
 @Table(name = "part_operation", uniqueConstraints = @UniqueConstraint(columnNames = {"part_id", "sequence"}))
 @SequenceGenerator(name = "part_operation_seq", sequenceName = "part_operation_seq", allocationSize = 1)
 public class PartOperation extends Auditable {

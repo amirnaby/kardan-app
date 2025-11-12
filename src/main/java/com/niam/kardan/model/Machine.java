@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity
+@Entity(name = "Machine")
 @Table(name = "machine")
 @SequenceGenerator(name = "machine_seq", sequenceName = "machine_seq", allocationSize = 1)
 public class Machine extends Auditable {

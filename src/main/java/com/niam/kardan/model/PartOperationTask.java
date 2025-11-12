@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity
+@Entity(name = "PartOperationTask")
 @Table(name = "part_operation_task")
 @SequenceGenerator(name = "part_operation_task_seq", sequenceName = "part_operation_task_seq", allocationSize = 1)
 public class PartOperationTask extends Auditable {

@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity
+@Entity(name = "Operator")
 @Table(name = "operator")
 @SequenceGenerator(name = "operator_seq", sequenceName = "operator_seq", allocationSize = 1)
 public class Operator extends Auditable {
