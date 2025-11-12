@@ -23,12 +23,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Project")
-@Table
-@SequenceGenerator(name = "Project_seq", sequenceName = "Project_seq", allocationSize = 1)
+@Entity
+@Table(name = "project")
+@SequenceGenerator(name = "project_seq", sequenceName = "project_seq", allocationSize = 1)
 public class Project extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Project_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_seq")
     private Long id;
     @NotNull
     @NotBlank

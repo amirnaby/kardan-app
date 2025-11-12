@@ -21,12 +21,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "OperationExecution")
-@Table
-@SequenceGenerator(name = "OperationExecution_seq", sequenceName = "OperationExecution_seq", allocationSize = 1)
+@Entity
+@Table(name = "operation_execution")
+@SequenceGenerator(name = "operation_execution_seq", sequenceName = "operation_execution_seq", allocationSize = 1)
 public class OperationExecution extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperationExecution_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "operation_execution_seq")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)

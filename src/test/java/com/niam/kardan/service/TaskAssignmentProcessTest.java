@@ -9,15 +9,19 @@ import com.niam.kardan.model.PartOperationTask;
 import com.niam.kardan.model.basedata.BaseData;
 import com.niam.kardan.model.basedata.ExecutionStatus;
 import com.niam.kardan.model.basedata.TaskStatus;
-import com.niam.kardan.repository.*;
-import com.niam.kardan.repository.basedata.ExecutionStatusRepository;
-import com.niam.kardan.repository.basedata.TaskStatusRepository;
+import com.niam.kardan.model.basedata.enums.EXECUTION_STATUS;
+import com.niam.kardan.model.basedata.enums.TASK_STATUS;
+import com.niam.kardan.repository.OperationExecutionRepository;
+import com.niam.kardan.repository.OperatorMachineRepository;
+import com.niam.kardan.repository.PartOperationTaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 
@@ -27,27 +31,28 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class TaskAssignmentProcessTest {
     @Mock
     PartOperationTaskRepository partOperationTaskRepository;
     @Mock
     OperationExecutionRepository operationExecutionRepository;
     @Mock
-    MachineRepository machineRepository;
-    @Mock
-    OperatorRepository operatorRepository;
-    @Mock
     OperatorMachineRepository operatorMachineRepository;
     @Mock
-    TaskStatusRepository taskStatusRepository;
+    MachineService machineService;
     @Mock
-    ExecutionStatusRepository executionStatusRepository;
+    OperatorService operatorService;
     @Mock
     MessageUtil messageUtil;
-
     @InjectMocks
     OperationExecutionService operationExecutionService;
-
+    @Mock
+    private GenericBaseDataService<TaskStatus> taskStatusService;
+    @Mock
+    private GenericBaseDataService<ExecutionStatus> executionStatusService;
+    @Mock
+    private GenericBaseDataServiceFactory baseDataServiceFactory;
     private PartOperationTask task;
     private Operator op1;
     private Operator op2;
@@ -57,7 +62,7 @@ class TaskAssignmentProcessTest {
     void setup() {
         task = new PartOperationTask();
         task.setId(500L);
-        task.setTaskStatus(BaseData.ofCode(TaskStatus.class, "PENDING"));
+        task.setTaskStatus(BaseData.ofCode(TaskStatus.class, TASK_STATUS.PENDING.name()));
         machine = new Machine();
         machine.setId(700L);
         task.setTargetMachine(machine);
@@ -65,25 +70,27 @@ class TaskAssignmentProcessTest {
         op1.setId(1L);
         op2 = new Operator();
         op2.setId(2L);
+
+        when(baseDataServiceFactory.create(TaskStatus.class)).thenReturn(taskStatusService);
+        when(baseDataServiceFactory.create(ExecutionStatus.class)).thenReturn(executionStatusService);
     }
 
     @Test
     void firstOperatorWinsClaimSecondFails() {
-        // first call: repository returns PENDING, operator assigned -> success
         when(partOperationTaskRepository.findByIdForUpdate(500L)).thenReturn(Optional.of(task));
-        when(operatorRepository.findById(1L)).thenReturn(Optional.of(op1));
-        when(machineRepository.findById(700L)).thenReturn(Optional.of(machine));
+        when(operatorService.getById(1L)).thenReturn(op1);
+        when(machineService.getById(700L)).thenReturn(machine);
         when(operatorMachineRepository.existsByOperatorIdAndMachineIdAndUnassignedAtIsNull(1L, 700L)).thenReturn(true);
-        when(taskStatusRepository.findByCode("IN_PROGRESS")).thenReturn(Optional.of(BaseData.ofCode(TaskStatus.class, "IN_PROGRESS")));
-        when(executionStatusRepository.findByCode("STARTED")).thenReturn(Optional.of(BaseData.ofCode(ExecutionStatus.class, "STARTED")));
+        when(taskStatusService.getByCode(TASK_STATUS.IN_PROGRESS.name())).thenReturn(BaseData.ofCode(TaskStatus.class, TASK_STATUS.IN_PROGRESS.name()));
+        when(executionStatusService.getByCode(EXECUTION_STATUS.STARTED.name())).thenReturn(BaseData.ofCode(ExecutionStatus.class, EXECUTION_STATUS.STARTED.name()));
         when(operationExecutionRepository.save(any(OperationExecution.class))).thenAnswer(i -> i.getArguments()[0]);
         when(partOperationTaskRepository.save(any(PartOperationTask.class))).thenAnswer(i -> i.getArguments()[0]);
 
         OperationExecution exec1 = operationExecutionService.claimAndStartTask(500L, 1L, 700L);
         assertThat(exec1).isNotNull();
 
-        // second operator tries: simulate that task now not PENDING
-        task.setTaskStatus(BaseData.ofCode(TaskStatus.class, "IN_PROGRESS"));
+        // second operator tries
+        task.setTaskStatus(BaseData.ofCode(TaskStatus.class, TASK_STATUS.IN_PROGRESS.name()));
         when(partOperationTaskRepository.findByIdForUpdate(500L)).thenReturn(Optional.of(task));
         assertThatThrownBy(() -> operationExecutionService.claimAndStartTask(500L, 2L, 700L))
                 .isInstanceOf(IllegalStateException.class);

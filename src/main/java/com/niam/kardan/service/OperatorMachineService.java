@@ -29,7 +29,7 @@ public class OperatorMachineService {
     @Autowired
     private OperatorMachineService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operatorMachines", "operatorMachine"}, allEntries = true)
     public OperatorMachine create(OperatorMachine operatorMachine) {
         boolean exists = operatorMachineRepository.existsByOperatorIdAndMachineIdAndUnassignedAtIsNull(
@@ -47,7 +47,7 @@ public class OperatorMachineService {
         return operatorMachineRepository.save(operatorMachine);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operatorMachines", "operatorMachine"}, allEntries = true)
     public OperatorMachine update(Long id, OperatorMachine updated) {
         OperatorMachine existing = operatorMachineRepository.findById(id)
@@ -61,7 +61,7 @@ public class OperatorMachineService {
         return operatorMachineRepository.save(existing);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     @Cacheable(value = "operatorMachine", key = "#id")
     public OperatorMachine getById(Long id) {
         return operatorMachineRepository.findById(id)
@@ -71,13 +71,13 @@ public class OperatorMachineService {
                         messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(), "OperatorMachine")));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     @Cacheable(value = "operatorMachines")
     public List<OperatorMachine> getAll() {
         return operatorMachineRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operatorMachines", "operatorMachine"}, allEntries = true)
     public void unassign(Long id) {
         OperatorMachine existing = self.getById(id);
@@ -91,7 +91,7 @@ public class OperatorMachineService {
         operatorMachineRepository.save(existing);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     public List<OperatorMachine> findActiveMachinesByOperator(Long operatorId) {
         return operatorMachineRepository.findByOperatorIdAndUnassignedAtIsNull(operatorId);
     }

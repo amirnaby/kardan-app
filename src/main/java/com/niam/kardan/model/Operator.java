@@ -15,12 +15,12 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Operator")
-@Table
-@SequenceGenerator(name = "Operator_seq", sequenceName = "Operator_seq", allocationSize = 1)
+@Entity
+@Table(name = "operator")
+@SequenceGenerator(name = "operator_seq", sequenceName = "operator_seq", allocationSize = 1)
 public class Operator extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Operator_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "operator_seq")
     private Long id;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)

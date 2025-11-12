@@ -1,12 +1,9 @@
 package com.niam.kardan.service;
 
-import com.niam.common.utils.MessageUtil;
 import com.niam.kardan.model.Operator;
 import com.niam.kardan.model.OperatorShift;
 import com.niam.kardan.model.Shift;
-import com.niam.kardan.repository.OperatorRepository;
 import com.niam.kardan.repository.OperatorShiftRepository;
-import com.niam.kardan.repository.ShiftRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,13 +20,6 @@ import static org.mockito.Mockito.*;
 class OperatorShiftProcessTest {
     @Mock
     OperatorShiftRepository operatorShiftRepository;
-    @Mock
-    OperatorRepository operatorRepository;
-    @Mock
-    ShiftRepository shiftRepository;
-    @Mock
-    MessageUtil messageUtil;
-
     @InjectMocks
     OperatorShiftService operatorShiftService;
 
@@ -65,6 +55,7 @@ class OperatorShiftProcessTest {
 
         when(operatorShiftRepository.findById(1000L)).thenReturn(Optional.of(saved));
         operatorShiftService.unassign(1000L);
-        verify(operatorShiftRepository).save(argThat(s -> s.getUnassignedAt() != null));
+        verify(operatorShiftRepository, times(2)).save(any(OperatorShift.class));
+        verify(operatorShiftRepository, atLeastOnce()).save(argThat(op -> op.getUnassignedAt() != null));
     }
 }

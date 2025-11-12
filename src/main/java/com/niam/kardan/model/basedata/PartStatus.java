@@ -2,23 +2,25 @@ package com.niam.kardan.model.basedata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Data
 @SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Entity(name = "PartStatus")
-@Table
-@SequenceGenerator(name = "PartStatus_seq", sequenceName = "PartStatus_seq", allocationSize = 1)
+@Entity
+@Table(name = "part_status")
+@SequenceGenerator(name = "part_status_seq", sequenceName = "part_status_seq", allocationSize = 1)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PartStatus extends BaseData {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PartStatus_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_status_seq")
     private Long id;
+
+    public PartStatus() {
+    }
 }

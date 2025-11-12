@@ -1,0 +1,102 @@
+package com.niam.kardan.controller;
+
+import com.niam.kardan.model.basedata.BaseData;
+import com.niam.kardan.service.GenericBaseDataService;
+import com.niam.kardan.service.GenericBaseDataServiceFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/basedata")
+@RequiredArgsConstructor
+public class BaseDataController {
+    private final GenericBaseDataServiceFactory factory;
+
+    /**
+     * Example: GET /api/basedata/ExecutionStatus
+     * Returns all ExecutionStatus records.
+     */
+    @GetMapping("/{entity}")
+    public ResponseEntity<List<? extends BaseData>> getAll(@PathVariable String entity) {
+        Class<? extends BaseData> type = resolveEntity(entity);
+        GenericBaseDataService<? extends BaseData> service = factory.create(type);
+        return ResponseEntity.ok(service.getAll());
+    }
+
+    /**
+     * Example: GET /api/basedata/ExecutionStatus/1
+     */
+    @GetMapping("/{entity}/{id}")
+    public ResponseEntity<BaseData> getById(@PathVariable String entity, @PathVariable Long id) {
+        Class<? extends BaseData> type = resolveEntity(entity);
+        GenericBaseDataService<? extends BaseData> service = factory.create(type);
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    /**
+     * Example: GET /api/basedata/ExecutionStatus/code/STARTED
+     */
+    @GetMapping("/{entity}/code/{code}")
+    public ResponseEntity<BaseData> getByCode(@PathVariable String entity, @PathVariable String code) {
+        Class<? extends BaseData> type = resolveEntity(entity);
+        GenericBaseDataService<? extends BaseData> service = factory.create(type);
+        return ResponseEntity.ok(service.getByCode(code));
+    }
+
+    /**
+     * Example: POST /api/basedata/ExecutionStatus
+     * body: {"code":"STARTED","name":"Started","description":"Task has started"}
+     */
+    @PostMapping("/{entity}")
+    public ResponseEntity<BaseData> create(@PathVariable String entity, @RequestBody Map<String, Object> payload) {
+        Class<? extends BaseData> type = resolveEntity(entity);
+        GenericBaseDataService<? extends BaseData> service = factory.create(type);
+        return ResponseEntity.ok(service.create(payload));
+    }
+
+    /**
+     * Example: PUT /api/basedata/ExecutionStatus/1
+     */
+    @PutMapping("/{entity}/{id}")
+    public ResponseEntity<BaseData> update(
+            @PathVariable String entity,
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> payload) {
+        Class<? extends BaseData> type = resolveEntity(entity);
+        GenericBaseDataService<? extends BaseData> service = factory.create(type);
+        return ResponseEntity.ok(service.update(id, payload));
+    }
+
+    /**
+     * Example: DELETE /api/basedata/ExecutionStatus/1
+     */
+    @DeleteMapping("/{entity}/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String entity, @PathVariable Long id) {
+        Class<? extends BaseData> type = resolveEntity(entity);
+        GenericBaseDataService<? extends BaseData> service = factory.create(type);
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Dynamically resolve BaseData entity class by name.
+     * Throws 404 if class not found or not a BaseData subclass.
+     */
+    private Class<? extends BaseData> resolveEntity(String entity) {
+        try {
+            String full = "com.niam.kardan.model.basedata." + entity;
+            Class<?> clazz = Class.forName(full);
+            if (!BaseData.class.isAssignableFrom(clazz))
+                throw new IllegalArgumentException(entity + " is not a BaseData entity");
+            @SuppressWarnings("unchecked")
+            Class<? extends BaseData> type = (Class<? extends BaseData>) clazz;
+            return type;
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("Entity not found: " + entity);
+        }
+    }
+}

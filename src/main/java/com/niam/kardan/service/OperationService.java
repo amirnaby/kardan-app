@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, value = "transactionManager")
 public class OperationService {
     private final OperationRepository operationRepository;
     private final MessageUtil messageUtil;
@@ -29,13 +29,13 @@ public class OperationService {
     @Autowired
     private OperationService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operations", "operation"}, allEntries = true)
     public Operation create(Operation operation) {
         return operationRepository.save(operation);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operations", "operation"}, allEntries = true)
     public Operation update(Long id, Operation updated) {
         Operation existing = self.getById(id);
@@ -59,7 +59,7 @@ public class OperationService {
         return operationRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operations", "operation"}, allEntries = true)
     public void delete(Long id) {
         Operation operation = self.getById(id);

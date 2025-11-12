@@ -8,8 +8,7 @@ import java.util.List;
 
 @Repository
 public interface OperationStopRepository extends JpaRepository<OperationStop, Long> {
-    // find stops by execution
-    List<OperationStop> findByOperationExecutionId(Long executionId);
+    List<OperationStop> findAllByOperationExecutionIdAndEndedAtIsNull(Long operationExecutionId);
 
     // find open stops (ended_at is null) for a machine or execution
     List<OperationStop> findByOperationExecutionMachineIdAndEndedAtIsNull(Long machineId);

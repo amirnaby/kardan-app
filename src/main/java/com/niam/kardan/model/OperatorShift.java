@@ -20,12 +20,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "OperatorShift")
-@Table
-@SequenceGenerator(name = "OperatorShift_seq", sequenceName = "OperatorShift_seq", allocationSize = 1)
+@Entity
+@Table(name = "operator_shift")
+@SequenceGenerator(name = "operator_shift_seq", sequenceName = "operator_shift_seq", allocationSize = 1)
 public class OperatorShift extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OperatorShift_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "operator_shift_seq")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id", referencedColumnName = "id", nullable = false)

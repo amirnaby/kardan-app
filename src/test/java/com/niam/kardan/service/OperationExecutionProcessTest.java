@@ -6,9 +6,11 @@ import com.niam.kardan.model.*;
 import com.niam.kardan.model.basedata.BaseData;
 import com.niam.kardan.model.basedata.ExecutionStatus;
 import com.niam.kardan.model.basedata.TaskStatus;
-import com.niam.kardan.repository.*;
-import com.niam.kardan.repository.basedata.ExecutionStatusRepository;
-import com.niam.kardan.repository.basedata.TaskStatusRepository;
+import com.niam.kardan.model.basedata.enums.EXECUTION_STATUS;
+import com.niam.kardan.model.basedata.enums.TASK_STATUS;
+import com.niam.kardan.repository.OperationExecutionRepository;
+import com.niam.kardan.repository.OperatorMachineRepository;
+import com.niam.kardan.repository.PartOperationTaskRepository;
 import com.niam.usermanagement.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,23 +32,21 @@ class OperationExecutionProcessTest {
     @Mock
     OperationExecutionRepository operationExecutionRepository;
     @Mock
-    OperationStopRepository operationStopRepository;
+    MachineService machineService;
     @Mock
-    MachineRepository machineRepository;
-    @Mock
-    OperatorRepository operatorRepository;
+    OperatorService operatorService;
     @Mock
     OperatorMachineRepository operatorMachineRepository;
-    @Mock
-    ExecutionStatusRepository executionStatusRepository;
-    @Mock
-    TaskStatusRepository taskStatusRepository;
-    @Mock
-    MessageUtil messageUtil;
-
     @InjectMocks
     OperationExecutionService operationExecutionService;
-
+    @Mock
+    private GenericBaseDataServiceFactory baseDataServiceFactory;
+    @Mock
+    private GenericBaseDataService<TaskStatus> taskStatusService;
+    @Mock
+    private GenericBaseDataService<ExecutionStatus> executionStatusService;
+    @Mock
+    private MessageUtil messageUtil;
     private PartOperationTask task;
     private Operator operator;
     private Machine machine;
@@ -55,59 +55,76 @@ class OperationExecutionProcessTest {
     void setUp() {
         task = new PartOperationTask();
         task.setId(100L);
-        task.setTaskStatus(BaseData.ofCode(TaskStatus.class, "PENDING"));
-        Machine target = new Machine();
-        target.setId(200L);
-        target.setCode("M-1");
-        task.setTargetMachine(target);
+
+        TaskStatus pendingStatus = BaseData.ofCode(TaskStatus.class, TASK_STATUS.PENDING.name());
+        task.setTaskStatus(pendingStatus);
+
+        machine = new Machine();
+        machine.setId(200L);
+        machine.setCode("M-1");
+        task.setTargetMachine(machine);
+
         task.setPartOperation(new PartOperation());
 
         operator = new Operator();
         operator.setId(10L);
-        machine = target;
-
         User user = new User();
         user.setUsername("testuser");
         operator.setUser(user);
-
     }
 
     @Test
     void claimAndStartTask_success_then_finish() {
+        TaskStatus inProgressStatus = BaseData.ofCode(TaskStatus.class, TASK_STATUS.IN_PROGRESS.name());
+        TaskStatus completedTaskStatus = BaseData.ofCode(TaskStatus.class, TASK_STATUS.COMPLETED.name());
+
+        ExecutionStatus startedStatus = BaseData.ofCode(ExecutionStatus.class, EXECUTION_STATUS.STARTED.name());
+        ExecutionStatus completedExecStatus = BaseData.ofCode(ExecutionStatus.class, EXECUTION_STATUS.COMPLETED.name());
+
+        when(baseDataServiceFactory.create(TaskStatus.class)).thenReturn(taskStatusService);
+        when(baseDataServiceFactory.create(ExecutionStatus.class)).thenReturn(executionStatusService);
+
+        when(taskStatusService.getByCode(TASK_STATUS.IN_PROGRESS.name())).thenReturn(inProgressStatus);
+        when(taskStatusService.getByCode(TASK_STATUS.COMPLETED.name())).thenReturn(completedTaskStatus);
+        when(executionStatusService.getByCode(EXECUTION_STATUS.STARTED.name())).thenReturn(startedStatus);
+        when(executionStatusService.getByCode(EXECUTION_STATUS.COMPLETED.name())).thenReturn(completedExecStatus);
+
         when(partOperationTaskRepository.findByIdForUpdate(100L)).thenReturn(Optional.of(task));
-        when(operatorRepository.findById(10L)).thenReturn(Optional.of(operator));
-        when(machineRepository.findById(200L)).thenReturn(Optional.of(machine));
+        when(operatorService.getById(10L)).thenReturn(operator);
+        when(machineService.getById(200L)).thenReturn(machine);
         when(operatorMachineRepository.existsByOperatorIdAndMachineIdAndUnassignedAtIsNull(10L, 200L)).thenReturn(true);
-        when(taskStatusRepository.findByCode("IN_PROGRESS")).thenReturn(Optional.of(BaseData.ofCode(TaskStatus.class, "IN_PROGRESS")));
-        when(executionStatusRepository.findByCode("STARTED")).thenReturn(Optional.of(BaseData.ofCode(ExecutionStatus.class, "STARTED")));
         when(operationExecutionRepository.save(any(OperationExecution.class))).thenAnswer(i -> i.getArguments()[0]);
         when(partOperationTaskRepository.save(any(PartOperationTask.class))).thenAnswer(i -> i.getArguments()[0]);
 
+        // --- اجرای claim و start ---
         OperationExecution exec = operationExecutionService.claimAndStartTask(100L, 10L, 200L);
 
+        // --- assertions بعد از start ---
         assertThat(exec).isNotNull();
         assertThat(exec.getOperator().getId()).isEqualTo(10L);
-        assertThat(task.getTaskStatus().getCode()).isEqualTo("IN_PROGRESS");
+        assertThat(task.getTaskStatus().getCode()).isEqualTo(TASK_STATUS.IN_PROGRESS.name());
         verify(partOperationTaskRepository).save(task);
         verify(operationExecutionRepository).save(any(OperationExecution.class));
 
-        // mocks for finish
-        when(executionStatusRepository.findByCode("COMPLETED")).thenReturn(Optional.of(BaseData.ofCode(ExecutionStatus.class, "COMPLETED")));
-        when(taskStatusRepository.findByCode("COMPLETED")).thenReturn(Optional.of(BaseData.ofCode(TaskStatus.class, "COMPLETED")));
-        when(operationExecutionRepository.findById(anyLong())).thenReturn(Optional.of(exec));
+        when(operationExecutionRepository.findById(exec.getId())).thenReturn(Optional.of(exec));
         when(partOperationTaskRepository.save(any(PartOperationTask.class))).thenAnswer(i -> i.getArguments()[0]);
         when(operationExecutionRepository.save(any(OperationExecution.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        OperationExecution finished = operationExecutionService.finishExecution(exec.getId() == null ? 0L : exec.getId());
+        // --- اجرای finish ---
+        OperationExecution finished = operationExecutionService.finishExecution(exec.getId());
 
-        assertThat(finished.getExecutionStatus().getCode()).isEqualTo("COMPLETED");
+        // --- assertions بعد از finish ---
+        assertThat(finished.getExecutionStatus().getCode()).isEqualTo(EXECUTION_STATUS.COMPLETED.name());
         assertThat(finished.getEndTime()).isNotNull();
         verify(partOperationTaskRepository, atLeastOnce()).save(any(PartOperationTask.class));
+        verify(operationExecutionRepository, atLeastOnce()).save(exec);
     }
 
     @Test
     void claimAndStartTask_whenNotPending_throws() {
-        task.setTaskStatus(BaseData.ofCode(TaskStatus.class, "CLAIMED"));
+        task.setTaskStatus(new TaskStatus());
+        task.getTaskStatus().setCode(TASK_STATUS.CLAIMED.name());
+
         when(partOperationTaskRepository.findByIdForUpdate(100L)).thenReturn(Optional.of(task));
 
         assertThatThrownBy(() -> operationExecutionService.claimAndStartTask(100L, 10L, 200L))
@@ -117,8 +134,8 @@ class OperationExecutionProcessTest {
     @Test
     void claimAndStartTask_whenOperatorNotAssigned_throws() {
         when(partOperationTaskRepository.findByIdForUpdate(100L)).thenReturn(Optional.of(task));
-        when(operatorRepository.findById(10L)).thenReturn(Optional.of(operator));
-        when(machineRepository.findById(200L)).thenReturn(Optional.of(machine));
+        when(operatorService.getById(10L)).thenReturn(operator);
+        when(machineService.getById(200L)).thenReturn(machine);
         when(operatorMachineRepository.existsByOperatorIdAndMachineIdAndUnassignedAtIsNull(10L, 200L)).thenReturn(false);
 
         assertThatThrownBy(() -> operationExecutionService.claimAndStartTask(100L, 10L, 200L))

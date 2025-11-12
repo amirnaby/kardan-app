@@ -21,9 +21,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, value = "transactionManager")
 public class ShiftService {
-
     private final ShiftRepository shiftRepository;
     private final OperatorShiftRepository operatorShiftRepository;
     private final MessageUtil messageUtil;
@@ -32,13 +31,13 @@ public class ShiftService {
     @Autowired
     private ShiftService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"shifts", "shift"}, allEntries = true)
     public Shift create(Shift shift) {
         return shiftRepository.save(shift);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"shifts", "shift"}, allEntries = true)
     public Shift update(Long id, Shift updated) {
         Shift existing = self.getById(id);
@@ -62,7 +61,7 @@ public class ShiftService {
         return shiftRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"shifts", "shift"}, allEntries = true)
     public void delete(Long id) {
         Shift shift = self.getById(id);

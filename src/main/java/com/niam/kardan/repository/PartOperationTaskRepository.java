@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface PartOperationTaskRepository extends JpaRepository<PartOperationTask, Long> {
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select t from PartOperationTask t where t.id = :id")
     Optional<PartOperationTask> findByIdForUpdate(@Param("id") Long id);

@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, value = "transactionManager")
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final MessageUtil messageUtil;
@@ -29,13 +29,13 @@ public class ProjectService {
     @Autowired
     private ProjectService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"projects", "project"}, allEntries = true)
     public Project create(Project project) {
         return projectRepository.save(project);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"projects", "project"}, allEntries = true)
     public Project update(Long id, Project updated) {
         Project existing = self.getById(id);
@@ -56,7 +56,7 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"projects", "project"}, allEntries = true)
     public void delete(Long id) {
         Project project = self.getById(id);

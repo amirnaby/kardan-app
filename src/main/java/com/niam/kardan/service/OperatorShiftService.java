@@ -27,7 +27,7 @@ public class OperatorShiftService {
     @Autowired
     OperatorShiftService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operatorShift", "operatorShifts"}, allEntries = true)
     public OperatorShift create(OperatorShift operatorShift) {
         boolean exists = operatorShiftRepository.existsByOperatorIdAndUnassignedAtIsNull(operatorShift.getOperator().getId());
@@ -39,7 +39,7 @@ public class OperatorShiftService {
         return operatorShiftRepository.save(operatorShift);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operatorShift", "operatorShifts"}, allEntries = true)
     public OperatorShift update(Long id, OperatorShift updated) {
         OperatorShift existing = self.getById(id);
@@ -47,7 +47,7 @@ public class OperatorShiftService {
         return operatorShiftRepository.save(existing);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     @Cacheable(value = "operatorShift", key = "#id")
     public OperatorShift getById(Long id) {
         return operatorShiftRepository.findById(id)
@@ -57,13 +57,13 @@ public class OperatorShiftService {
                         messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(), "OperatorShift")));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     @Cacheable(value = "operatorShifts")
     public List<OperatorShift> getAll() {
         return operatorShiftRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operatorShift", "operatorShifts"}, allEntries = true)
     public void unassign(Long id) {
         OperatorShift shift = self.getById(id);
@@ -75,7 +75,7 @@ public class OperatorShiftService {
         operatorShiftRepository.save(shift);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     public List<OperatorShift> findActiveShiftsByOperator(Long operatorId) {
         return operatorShiftRepository.findByOperatorIdAndUnassignedAtIsNull(operatorId);
     }

@@ -2,23 +2,25 @@ package com.niam.kardan.model.basedata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Data
 @SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Entity(name = "ProjectStatus")
-@Table
-@SequenceGenerator(name = "ProjectStatus_seq", sequenceName = "ProjectStatus_seq", allocationSize = 1)
+@Entity
+@Table(name = "project_status")
+@SequenceGenerator(name = "project_status_seq", sequenceName = "project_status_seq", allocationSize = 1)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProjectStatus extends BaseData {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ProjectStatus_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_status_seq")
     private Long id;
+
+    public ProjectStatus() {
+    }
 }

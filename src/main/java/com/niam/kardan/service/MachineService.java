@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, value = "transactionManager")
 public class MachineService {
     private final MachineRepository machineRepository;
     private final MessageUtil messageUtil;
@@ -29,13 +29,13 @@ public class MachineService {
     @Autowired
     private MachineService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"machines", "machine"}, allEntries = true)
     public Machine create(Machine machine) {
         return machineRepository.save(machine);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"machines", "machine"}, allEntries = true)
     public Machine update(Long id, Machine updated) {
         Machine existing = self.getById(id);
@@ -59,7 +59,7 @@ public class MachineService {
         return machineRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"machines", "machine"}, allEntries = true)
     public void delete(Long id) {
         Machine machine = self.getById(id);
@@ -71,7 +71,7 @@ public class MachineService {
         }
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"machines", "machine"}, allEntries = true)
     public Machine updateStatus(Long id, String newStatusCode) {
         Machine machine = self.getById(id);

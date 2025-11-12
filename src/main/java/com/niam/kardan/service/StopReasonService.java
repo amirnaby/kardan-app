@@ -20,9 +20,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, value = "transactionManager")
 public class StopReasonService {
-
     private final StopReasonRepository stopReasonRepository;
     private final MessageUtil messageUtil;
 
@@ -30,13 +29,13 @@ public class StopReasonService {
     @Autowired
     private StopReasonService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"stopReasons", "stopReason"}, allEntries = true)
     public StopReason create(StopReason stopReason) {
         return stopReasonRepository.save(stopReason);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"stopReasons", "stopReason"}, allEntries = true)
     public StopReason update(Long id, StopReason updated) {
         StopReason existing = self.getById(id);
@@ -60,7 +59,7 @@ public class StopReasonService {
         return stopReasonRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"stopReasons", "stopReason"}, allEntries = true)
     public void delete(Long id) {
         StopReason reason = self.getById(id);

@@ -28,7 +28,7 @@ public class OperatorService {
     @Autowired
     private OperatorService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operator", "operators"}, allEntries = true)
     public Operator create(Operator operator) {
         if (operatorRepository.existsByUserId(operator.getUser().getId())) {
@@ -38,7 +38,7 @@ public class OperatorService {
         return operatorRepository.save(operator);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operator", "operators"}, allEntries = true)
     public Operator update(Long id, Operator updatedOperator) {
         Operator existing = operatorRepository.findById(id)
@@ -50,7 +50,7 @@ public class OperatorService {
         return operatorRepository.save(existing);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     @Cacheable(value = "operator", key = "#id")
     public Operator getById(Long id) {
         return operatorRepository.findById(id)
@@ -60,13 +60,13 @@ public class OperatorService {
                         messageUtil.getMessage(ResultResponseStatus.ENTITY_NOT_FOUND.getDescription(), "Operator")));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     @Cacheable(value = "operators")
     public List<Operator> getAll() {
         return operatorRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"operator", "operators"}, allEntries = true)
     public void delete(Long id) {
         Operator operator = self.getById(id);
@@ -80,7 +80,7 @@ public class OperatorService {
         operatorRepository.delete(operator);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, value = "transactionManager")
     public Operator findByUserId(Long userId) {
         return operatorRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CacheService {
-
     private final CacheManager cacheManager;
 
     /**

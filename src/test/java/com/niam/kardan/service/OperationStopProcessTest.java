@@ -6,10 +6,9 @@ import com.niam.kardan.model.OperationStop;
 import com.niam.kardan.model.StopReason;
 import com.niam.kardan.model.basedata.BaseData;
 import com.niam.kardan.model.basedata.ExecutionStatus;
+import com.niam.kardan.model.basedata.enums.EXECUTION_STATUS;
 import com.niam.kardan.repository.OperationExecutionRepository;
 import com.niam.kardan.repository.OperationStopRepository;
-import com.niam.kardan.repository.StopReasonRepository;
-import com.niam.kardan.repository.basedata.ExecutionStatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,34 +32,48 @@ class OperationStopProcessTest {
     @Mock
     OperationStopRepository stopRepository;
     @Mock
-    StopReasonRepository stopReasonRepository;
-    @Mock
-    ExecutionStatusRepository executionStatusRepository;
-    @Mock
-    MessageUtil messageUtil;
-
+    StopReasonService stopReasonService;
     @InjectMocks
     OperationExecutionService operationExecutionService;
-
+    @Mock
+    private GenericBaseDataService<ExecutionStatus> executionStatusService;
+    @Mock
+    private GenericBaseDataServiceFactory baseDataServiceFactory;
+    @Mock
+    private GenericBaseDataService baseDataService;
+    @Mock
+    private MessageUtil messageUtil;
     private OperationExecution execution;
     private StopReason stopReason;
+    private ExecutionStatus stoppedStatus;
+    private ExecutionStatus resumedStatus;
 
     @BeforeEach
     void setUp() {
         execution = new OperationExecution();
         execution.setId(55L);
-        execution.setExecutionStatus(BaseData.ofCode(ExecutionStatus.class, "STARTED"));
         execution.setStartTime(LocalDateTime.now());
+
         stopReason = new StopReason();
         stopReason.setId(2L);
-        stopReason.setName("Brake");
+        stopReason.setName("Break");
+
+        stoppedStatus = BaseData.ofCode(ExecutionStatus.class, EXECUTION_STATUS.STOPPED.name());
+        resumedStatus = BaseData.ofCode(ExecutionStatus.class, EXECUTION_STATUS.STARTED.name());
+
+        when(baseDataServiceFactory.create(ExecutionStatus.class)).thenReturn(executionStatusService);
+        when(executionStatusService.getByCode(EXECUTION_STATUS.STOPPED.name())).thenReturn(stoppedStatus);
     }
 
     @Test
     void stopExecution_createsOperationStop_and_updatesExecutionStatus() {
+        execution.setExecutionStatus(new ExecutionStatus());
+        execution.getExecutionStatus().setCode(EXECUTION_STATUS.STARTED.name());
+
         when(executionRepository.findById(55L)).thenReturn(Optional.of(execution));
-        when(stopReasonRepository.findById(2L)).thenReturn(Optional.of(stopReason));
-        when(executionStatusRepository.findByCode("STOPPED")).thenReturn(Optional.of(BaseData.ofCode(ExecutionStatus.class, "STOPPED")));
+        when(stopReasonService.getById(2L)).thenReturn(stopReason);
+        when(executionStatusService.getByCode(EXECUTION_STATUS.STOPPED.name())).thenReturn(stoppedStatus);
+
         when(stopRepository.save(any(OperationStop.class))).thenAnswer(i -> {
             OperationStop s = (OperationStop) i.getArguments()[0];
             s.setId(99L);
@@ -68,30 +81,34 @@ class OperationStopProcessTest {
         });
         when(executionRepository.save(any(OperationExecution.class))).thenAnswer(i -> i.getArguments()[0]);
 
+        // --- اجرای stop ---
         OperationStop stop = operationExecutionService.stopExecution(55L, 2L, "emergency");
 
         assertThat(stop).isNotNull();
         assertThat(stop.getId()).isEqualTo(99L);
+        assertThat(execution.getExecutionStatus().getCode()).isEqualTo(EXECUTION_STATUS.STOPPED.name());
+        assertThat(execution.getStopTime()).isNotNull();
+
         verify(stopRepository).save(any(OperationStop.class));
         verify(executionRepository).save(any(OperationExecution.class));
-        assertThat(execution.getExecutionStatus().getCode()).isEqualTo("STOPPED");
-        assertThat(execution.getStopTime()).isNotNull();
     }
 
     @Test
-    void resumeAfterStop_setsResumedStatusAndStartTime() {
+    void resumeExecution_afterStop_setsResumedStatusAndStartTime() {
         // simulate execution currently stopped
-        execution.setExecutionStatus(BaseData.ofCode(ExecutionStatus.class, "STOPPED"));
+        execution.setExecutionStatus(stoppedStatus);
+        execution.setStopTime(LocalDateTime.now().minusMinutes(5));
+
         when(executionRepository.findById(55L)).thenReturn(Optional.of(execution));
         when(executionRepository.save(any(OperationExecution.class))).thenAnswer(i -> i.getArguments()[0]);
-        when(executionStatusRepository.findByCode("RESUMED")).thenReturn(Optional.of(BaseData.ofCode(ExecutionStatus.class, "RESUMED")));
 
-        // resume is modeled by calling claimAndStart-like behavior or updating execution directly
-        execution.setExecutionStatus(BaseData.ofCode(ExecutionStatus.class, "RESUMED"));
-        execution.setStartTime(LocalDateTime.now());
+        // --- اجرای resume ---
+        OperationExecution resumed = operationExecutionService.resumeAfterStop(55L);
 
-        OperationExecution resumed = executionRepository.save(execution);
-        assertThat(resumed.getExecutionStatus().getCode()).isEqualTo("RESUMED");
+        assertThat(resumed.getExecutionStatus().getCode()).isEqualTo(EXECUTION_STATUS.RUNNING.name());
         assertThat(resumed.getStartTime()).isNotNull();
+        assertThat(resumed.getStopTime()).isEqualTo(execution.getStopTime());
+
+        verify(executionRepository).save(execution);
     }
 }

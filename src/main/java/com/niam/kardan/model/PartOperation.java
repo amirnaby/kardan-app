@@ -16,12 +16,12 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "PartOperation")
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"part_id", "sequence"}))
-@SequenceGenerator(name = "PartOperation_seq", sequenceName = "PartOperation_seq", allocationSize = 1)
+@Entity
+@Table(name = "part_operation", uniqueConstraints = @UniqueConstraint(columnNames = {"part_id", "sequence"}))
+@SequenceGenerator(name = "part_operation_seq", sequenceName = "part_operation_seq", allocationSize = 1)
 public class PartOperation extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PartOperation_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_operation_seq")
     private Long id;
     @NotNull
     private Integer sequence;

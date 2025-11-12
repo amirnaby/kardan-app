@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, value = "transactionManager")
 public class PartService {
     private final PartRepository partRepository;
     private final MessageUtil messageUtil;
@@ -29,13 +29,13 @@ public class PartService {
     @Autowired
     private PartService self;
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"parts", "part"}, allEntries = true)
     public Part create(Part part) {
         return partRepository.save(part);
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"parts", "part"}, allEntries = true)
     public Part update(Long id, Part updated) {
         Part existing = self.getById(id);
@@ -56,7 +56,7 @@ public class PartService {
         return partRepository.findAll();
     }
 
-    @Transactional
+    @Transactional("transactionManager")
     @CacheEvict(value = {"parts", "part"}, allEntries = true)
     public void delete(Long id) {
         Part part = self.getById(id);

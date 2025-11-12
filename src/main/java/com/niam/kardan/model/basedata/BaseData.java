@@ -3,30 +3,36 @@ package com.niam.kardan.model.basedata;
 import com.niam.kardan.model.Auditable;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @EqualsAndHashCode(callSuper = false)
-@MappedSuperclass
 @SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Setter
+@Getter
+@MappedSuperclass
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class BaseData extends Auditable {
-    @NotNull
-    @NotBlank
+public abstract class BaseData extends Auditable {
+    @Column(nullable = false)
     private String name;
+
     private String description;
+
     @Column(unique = true, nullable = false, updatable = false)
     private String code;
+
+    public BaseData() {
+    }
+
+    public BaseData(Long id, String name, String description, String code) {
+        this.name = name;
+        this.description = description;
+        this.code = code;
+    }
 
     public BaseData(String code) {
         this.code = code;

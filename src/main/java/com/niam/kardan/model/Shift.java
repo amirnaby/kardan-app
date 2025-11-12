@@ -23,12 +23,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Shift")
-@Table
-@SequenceGenerator(name = "Shift_seq", sequenceName = "Shift_seq", allocationSize = 1)
+@Entity
+@Table(name = "shift")
+@SequenceGenerator(name = "shift_seq", sequenceName = "shift_seq", allocationSize = 1)
 public class Shift extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Shift_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shift_seq")
     private Long id;
     @NotNull
     @NotBlank

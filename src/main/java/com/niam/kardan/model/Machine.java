@@ -18,12 +18,12 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Entity(name = "Machine")
-@Table
-@SequenceGenerator(name = "Machine_seq", sequenceName = "Machine_seq", allocationSize = 1)
+@Entity
+@Table(name = "machine")
+@SequenceGenerator(name = "machine_seq", sequenceName = "machine_seq", allocationSize = 1)
 public class Machine extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Machine_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "machine_seq")
     private Long id;
     @NotNull
     @NotBlank
