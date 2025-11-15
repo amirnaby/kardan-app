@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/operator-shifts")
 public class OperatorShiftController {
-
     private final OperatorShiftService operatorShiftService;
     private final ResponseEntityUtil responseEntityUtil;
 

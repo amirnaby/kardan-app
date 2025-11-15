@@ -20,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true, value = "transactionManager")
 public class StopReasonService {
     private final StopReasonRepository stopReasonRepository;
     private final MessageUtil messageUtil;

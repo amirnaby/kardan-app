@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/executions")
 public class OperationExecutionController {
-
     private final OperationExecutionService operationExecutionService;
     private final ResponseEntityUtil responseEntityUtil;
 

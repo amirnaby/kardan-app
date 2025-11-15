@@ -21,7 +21,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true, value = "transactionManager")
 public class ShiftService {
     private final ShiftRepository shiftRepository;
     private final OperatorShiftRepository operatorShiftRepository;

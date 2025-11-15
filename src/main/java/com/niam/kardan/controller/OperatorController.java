@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/operators")
 public class OperatorController {
-
     private final OperatorService operatorService;
     private final ResponseEntityUtil responseEntityUtil;
 

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/part-operation-tasks")
 public class PartOperationTaskController {
-
     private final PartOperationTaskService partOperationTaskService;
     private final ResponseEntityUtil responseEntityUtil;
 

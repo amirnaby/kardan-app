@@ -20,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true, value = "transactionManager")
 public class PartService {
     private final PartRepository partRepository;
     private final MessageUtil messageUtil;

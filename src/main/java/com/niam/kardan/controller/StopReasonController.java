@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/stop-reasons")
 public class StopReasonController {
-
     private final StopReasonService stopReasonService;
     private final ResponseEntityUtil responseEntityUtil;
 
